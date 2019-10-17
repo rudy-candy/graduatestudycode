@@ -1,0 +1,42 @@
+void Esum_taupair_bg_piandgamma_fill_hist()  //(const char* filename)
+{
+  
+  //TFile* file = new TFile(filename);
+  TTree* t_pi = (TTree*)_file0->Get("t_pi");
+  ofstream fout("Esum_taupair_bg_piandgamma.dat");
+  std::string filename = Form("Esum_taupair_bg_piandgammma.dat");
+  std::string cname = "c_" + filename;
+  TCanvas* c = new TCanvas(cname.c_str(), cname.c_str(), 840, 560);
+  TH1* h = new TH1F(("h_"+filename).c_str(), ";Energy[GeV];taupair bg pi Entryies ", 200, 0, 10);
+
+  int pi_ncandidates;
+  int gamma_ncandidates;
+  float pi_E[100];
+  float gamma_E[100];
+  float Esum = 0;
+  t_pi->SetBranchAddress("__ncandidates__", &pi_ncandidates); 
+  t_gamma->SetBranchAddress("__ncandidates__", &gamma_ncandidates); 
+  t_pi->SetBranchAddress("E", pi_E);
+  t_gamma->SetBranchAddress("E", gamma_E);
+  for (int i = 0; i < t_pi->GetEntries(); i++) {
+    t_pi->GetEntry(i); 
+    Esum = 0;
+    for (int in = 0; in < pi_ncandidates; in++) {
+    	Esum +=  pi_E[in];  
+    }
+    fout << Esum;	fout << "\n";
+    h->Fill(Esum);
+  }
+
+TTree* t_gamma = (TTree*)_file0->Get("t_gamma");  for (int i = 0; i < t_gamma->GetEntries(); i++) {
+     t_gamma->GetEntry(i);
+     Esum = 0;
+     for (int in = 0; in < gamma_ncandidates; in++) {
+         Esum +=  gamma_E[in];
+     }
+     fout << Esum;       fout << "\n";
+     h->Fill(Esum);
+   }
+  fout.close();
+  h->Draw("hist");
+}
